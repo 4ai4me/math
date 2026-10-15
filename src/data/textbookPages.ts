@@ -1,0 +1,417 @@
+import { TextbookPage } from '../types';
+
+export const TEXTBOOK_PAGES: TextbookPage[] = [
+  {
+    pageNumber: 1,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '대단원 도입: 미래 사회를 움직이는 수학적 대응의 규칙',
+    pageType: 'intro',
+    kStemCompetencies: ['창의·융합', '정보처리', '태도및실천'],
+    title: '현대 문명과 알고리즘을 지탱하는 본질, 함수',
+    subtitle: '빅데이터, 인공지능 신경망, 컴퓨터 그래픽스 속의 함수적 사고',
+    content: {
+      thoughtOpening: {
+        scenario: '스마트폰 화면을 터치하면 화면의 (x, y) 2차원 좌표 데이터가 프로세서로 전달되어 지정된 특정 앱 아이콘 하나가 실행됩니다. 만약 하나의 화면 좌표를 눌렀을 때 두 개의 서로 다른 앱이 동시에 실행되거나, 아무런 반응도 없다면 시스템은 정상적으로 작동할 수 있을까요?',
+        question: '입력된 하나의 신호에 오직 하나의 결과를 결정하는 수학적 규칙은 일상과 인공지능 알고리즘에서 왜 필수적일까요?',
+        hint: '입력의 명확성(Well-defined)과 결과의 유일성(Uniqueness)이라는 함수의 두 가지 기본 요건을 생각해보세요.',
+      },
+      bodyParagraphs: [
+        '우리가 살아가는 디지털 세계의 모든 소프트웨어와 알고리즘은 하나의 신호(Input)를 받아 정해진 규칙에 따라 정확히 하나의 결과(Output)를 출력하는 메커니즘 위에서 작동합니다.',
+        '고대 바빌로니아의 천문 관측표에서 시작하여 17세기 라이프니츠의 미적분학, 19세기 디리클레의 임의 대응 개념을 거쳐 현대 부르바키의 집합론적 공리화에 이르기까지, 함수는 수학사에서 가장 혁명적인 도약의 중심에 있었습니다.',
+        '본 단원에서는 고등학교 2학년 수준의 수학적 엄밀성을 바탕으로, 대응 관계로서의 함수, 일대일대응과 역함수의 존재 조건, 그리고 합성함수의 다중 표상(Multi-Representation)을 체계적으로 탐구합니다.',
+      ],
+      deepThinking: {
+        title: 'K-STEM 미래 융합 생각거리',
+        prompt: '인공지능 딥러닝에서 인공 신경망(Neural Network)의 각 층(Layer)은 벡터 공간 사이의 거대한 합성함수 f(g(h(x)))로 해석됩니다. 활성화 함수(Activation Function)가 비선형이어야 하는 이유를 생각해보세요.',
+        academicLink: 'MIT Gil Strang 교수의 "Linear Algebra and Learning from Data" 제4장 신경망과 함수 합성 이론',
+      },
+    },
+  },
+  {
+    pageNumber: 2,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '01. 생각 열기: 현실 세계의 매핑(Mapping)과 함수',
+    pageType: 'intro',
+    kStemCompetencies: ['문제해결', '추론'],
+    title: '자판기 모델로 탐구하는 함수의 성립 조건',
+    subtitle: '정의역의 모든 원소가 공역의 원소에 오직 하나씩 대응하는 원리',
+    content: {
+      thoughtOpening: {
+        scenario: '어느 학교 휴게실에 설치된 음료수 자판기에는 4개의 버튼 [A, B, C, D]가 있고, 음료수 배출구에는 [생수, 콜라, 이온음료, 주스, 우유]가 채워져 있습니다. 학생 민우가 버튼 A를 눌렀더니 생수 1캔이 나왔습니다.',
+        question: '다음 상황 중 수학적으로 "함수"라고 부를 수 없는 경우는 무엇이며 그 이유는 무엇일까요?\n① 버튼 B를 눌렀는데 콜라와 주스가 동시에 2캔 나왔다.\n② 버튼 C를 눌렀는데 돈을 넣었음에도 아무 음료도 나오지 않고 먹통이 되었다.\n③ 버튼 D를 눌렀더니 버튼 A와 똑같이 생수가 나왔다.',
+        hint: '정의역의 각 원소는 반드시 짝을 찾아야 하며, 화살표를 2개 이상 쏠 수 없습니다.',
+      },
+      conceptBox: {
+        definitionName: '함수의 직관적 성립 조건 (자판기 비유)',
+        mathFormula: 'f : X \\to Y, \\quad \\forall x \\in X, \\; \\exists! y \\in Y \\text{ such that } f(x) = y',
+        description: '자판기의 모든 버튼은 눌렀을 때 반드시 음료가 나와야 하며(존재성), 동시에 여러 종류의 음료가 나와서는 안 됩니다(유일성). 그러나 서로 다른 버튼이 같은 음료를 배출하는 것은 허용됩니다.',
+        keyPoints: [
+          '조건 1: 정의역 X의 모든 원소는 빠짐없이 화살표를 출발시켜야 한다.',
+          '조건 2: 정의역 X의 각 원소는 오직 한 개의 화살표만 출발시켜야 한다.',
+          '주의: 공역 Y의 원소 중 화살표를 받지 못하는 원소가 있어도 함수이다.',
+          '주의: 공역 Y의 한 원소가 여러 개의 화살표를 동시에 받아도 함수이다.',
+        ],
+      },
+      bodyParagraphs: [
+        '수학에서 대응(Correspondence)이란 공집합이 아닌 두 집합 X, Y에 대하여 X의 원소에 Y의 원소를 짝 짓는 것을 뜻합니다.',
+        '이때 집합 X의 각 원소에 집합 Y의 원소가 오직 하나씩만 대응할 때, 이 대응을 X에서 Y로의 함수(Function)라 하고 기호로 f : X → Y 와 같이 나타냅니다.',
+      ],
+    },
+  },
+  {
+    pageNumber: 3,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '02. 함수의 뜻과 정의역·공역·치역',
+    pageType: 'concept',
+    kStemCompetencies: ['추론', '의사소통'],
+    title: '정의역, 공역, 치역의 집합론적 엄밀화',
+    subtitle: '함숫값의 전체 집합으로서 치역(Range)과 공역(Codomain)의 구별',
+    content: {
+      conceptBox: {
+        definitionName: '정의역, 공역, 치역의 정의',
+        mathFormula: 'f(X) = \\{ f(x) \\mid x \\in X \\} \\subseteq Y',
+        description: '함수 f: X → Y에서 집합 X를 정의역(Domain), 집합 Y를 공역(Codomain)이라 한다. 또한 정의역 X의 모든 원소의 함숫값 전체의 집합 f(X)를 치역(Range)이라 한다.',
+        keyPoints: [
+          '정의역(Domain): 화살표를 쏘는 출발 집합 X',
+          '공역(Codomain): 화살표가 도달할 수 있는 후보 전체의 집합 Y',
+          '치역(Range): 실제로 화살표를 받은 함숫값들의 부분집합 f(X)',
+          '치역은 항상 공역의 부분집합이다: f(X) ⊆ Y',
+        ],
+      },
+      bodyParagraphs: [
+        '많은 학생들이 흔히 공역과 치역을 혼동합니다. 예를 들어 실수 전체의 집합 R에서 R로의 함수 f(x) = x²을 생각해보면, 공역은 모든 실수 R이지만, 어떤 실수를 제곱해도 음수가 될 수 없으므로 치역은 0 이상의 실수 집합 { y | y ≥ 0 }입니다.',
+        '치역이 공역과 완전히 일치하는지 여부는 향후 다루게 될 "일대일대응" 및 "역함수 존재성"의 결정적 기준이 됩니다.',
+      ],
+      exampleProblem: {
+        question: '집합 X = {-1, 0, 1}에서 집합 Y = {0, 1, 2, 3}으로의 함수 f(x) = x² + 1 에 대하여 치역을 구하시오.',
+        solutionSteps: [
+          '1단계: 정의역 X의 각 원소의 함숫값을 계산합니다.',
+          '  f(-1) = (-1)² + 1 = 1 + 1 = 2',
+          '  f(0) = 0² + 1 = 1',
+          '  f(1) = 1² + 1 = 1 + 1 = 2',
+          '2단계: 계산된 함숫값들을 원소로 하는 집합을 구성합니다.',
+          '  치역 f(X) = {1, 2}',
+          '3단계: 치역 {1, 2}가 공역 Y = {0, 1, 2, 3}의 진부분집합임을 확인합니다.',
+        ],
+        answer: '치역 f(X) = {1, 2}',
+        practiceProblem: {
+          question: '집합 X = {-2, -1, 0, 1, 2}에서 정의된 함수 g(x) = |x| - 1 의 치역을 구하시오.',
+          answer: '{-1, 0, 1}',
+          explanation: 'g(-2)=1, g(-1)=0, g(0)=-1, g(1)=0, g(2)=1 이므로 중복을 제외한 원소는 {-1, 0, 1}입니다.',
+        },
+      },
+    },
+  },
+  {
+    pageNumber: 4,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '03. 함수의 그래프와 수직선 판별법(Vertical Line Test)',
+    pageType: 'concept',
+    kStemCompetencies: ['추론', '정보처리'],
+    title: '좌표평면 위에서 함수를 시각적으로 판별하는 법',
+    subtitle: '순서쌍 집합 G = {(x, f(x)) | x ∈ X}과 수직선 판별법의 수학적 원리',
+    content: {
+      conceptBox: {
+        definitionName: '함수의 그래프와 수직선 판별법',
+        mathFormula: 'G = \\{ (x, f(x)) \\mid x \\in X \\} \\subset X \\times Y',
+        description: '좌표평면 위의 어떤 도형이 함수의 그래프가 되기 위한 필요충분조건은, 정의역의 임의의 실수 k에 대하여 y축에 평행한 수직선 x = k를 그었을 때, 그 수직선이 주어진 도형과 오직 한 점에서만 만나야 한다.',
+        keyPoints: [
+          '수직선 x = k가 그래프와 2점 이상에서 만난다 → 하나의 x값에 2개 이상의 y값이 대응하므로 함수가 아님.',
+          '수직선 x = k가 그래프와 전혀 만나지 않는다 → 해당 x값에 대응하는 함숫값이 없으므로 함수가 아님.',
+          '대표적 반례: 원의 방정식 x² + y² = r²은 x = 0에서 y = ±r의 2개 점과 만나므로 함수가 아님.',
+          '타원, 쌍곡선, 포물선(x = y²) 역시 수직선과 2점에서 만나므로 양함수(Explicit Function)가 아님.',
+        ],
+      },
+      bodyParagraphs: [
+        '고등학교 1학년에서 학습한 원의 방정식 (x - a)² + (y - b)² = r²을 왜 "원함수"라고 부르지 않고 "원의 방정식"이라고 부르는지 그 이유가 바로 여기에 있습니다.',
+        '원을 함수로 다루기 위해서는 상반원 y = b + √(r² - (x-a)²)과 하반원 y = b - √(r² - (x-a)²)의 두 개 함수로 분리하여 다루어야 합니다.',
+      ],
+      deepThinking: {
+        title: 'Tall & Vinner의 Concept Image(개념 심상) 분석',
+        prompt: '많은 학생들이 "부드럽게 이어진 곡선이나 하나의 대수식으로 표현되면 무조건 함수"라는 잘못된 개념 심상을 지니고 있습니다. 디리클레 함수나 불연속 계단함수도 엄밀한 함수임을 기억하세요.',
+        academicLink: 'Vinner & Dreyfus (1989), "Images and definitions for the concept of function with college students"',
+      },
+    },
+  },
+  {
+    pageNumber: 5,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '04. 여러 가지 함수: 일대일함수와 일대일대응',
+    pageType: 'concept',
+    kStemCompetencies: ['문제해결', '추론'],
+    title: '단사(Injective)와 전단사(Bijective)의 구분',
+    subtitle: '일대일함수와 일대일대응의 결정적 차이: 치역과 공역의 일치 여부',
+    content: {
+      conceptBox: {
+        definitionName: '일대일함수와 일대일대응의 엄밀한 정의',
+        mathFormula: 'x_1 \\neq x_2 \\implies f(x_1) \\neq f(x_2) \\quad \\text{and} \\quad f(X) = Y',
+        description: '① 일대일함수(단사함수, Injection): 정의역 X의 임의의 두 원소 x₁, x₂에 대하여 x₁ ≠ x₂ 이면 f(x₁) ≠ f(x₂)를 만족하는 함수.\n② 일대일대응(전단사함수, Bijection): 일대일함수이면서 동시에 치역과 공역이 같은 함수 (f(X) = Y).',
+        keyPoints: [
+          '대우명제: f(x₁) = f(x₂) 이면 x₁ = x₂ 이다 (증명에 자주 활용됨).',
+          '일대일함수 ⊂ 일대일대응 (일대일대응은 일대일함수보다 훨씬 강력한 조건).',
+          '연속함수가 실수 전체에서 일대일대응이려면 반드시 순증가(Strictly Increasing)하거나 순감소(Strictly Decreasing)해야 한다.',
+          '일대일대응은 이후 역함수가 존재하기 위한 절대적 필요충분조건이다.',
+        ],
+      },
+      bodyParagraphs: [
+        '이차함수 f(x) = x²은 정의역이 실수 전체 R일 때 f(-2) = f(2) = 4 이므로 일대일함수가 아닙니다.',
+        '하지만 정의역을 { x | x ≥ 0 }으로 제한하고 공역을 { y | y ≥ 0 }으로 제한하면 f(x) = x²은 일대일대응이 되며, 비로소 무리함수인 역함수 f⁻¹(x) = √x가 정의될 수 있습니다.',
+      ],
+      exampleProblem: {
+        question: '실수 전체의 집합에서 정의된 함수 f(x) = (a - 2)x + 3 이 일대일대응이 되기 위한 실수 a의 값의 범위를 구하시오.',
+        solutionSteps: [
+          '1단계: f(x)는 일차식 형태의 직선 함수입니다.',
+          '2단계: 직선이 실수 전체에서 일대일대응이 되려면 기울기가 0이 아니어야 합니다 (기울기가 0이면 상수함수가 됨).',
+          '3단계: 기울기 a - 2 ≠ 0 이어야 하므로 a ≠ 2 입니다.',
+          '4단계: 기울기가 양수이면 순증가, 음수이면 순감소하므로 치역이 실수 전체가 되어 공역과 일치합니다.',
+        ],
+        answer: 'a ≠ 2 인 모든 실수',
+        practiceProblem: {
+          question: '집합 X = {x | 1 ≤ x ≤ 3}, Y = {y | 2 ≤ y ≤ 8}에 대하여 f(x) = ax + b (a < 0)가 X에서 Y로의 일대일대응일 때, a + b의 값을 구하시오.',
+          answer: '8',
+          explanation: 'a < 0이므로 f(x)는 감소함수입니다. 따라서 f(1) = 8, f(3) = 2 가 되어 a + b = 8, 3a + b = 2. 연립하면 a = -3, b = 11 이므로 a + b = 8입니다.',
+        },
+      },
+    },
+  },
+  {
+    pageNumber: 6,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '05. 수평선 판별법(Horizontal Line Test)과 특수 함수',
+    pageType: 'concept',
+    kStemCompetencies: ['추론', '정보처리'],
+    title: '일대일 판별의 기하학적 도구와 항등·상수함수',
+    subtitle: 'x축에 평행한 직선 y = k와의 교점 분석 및 I(x) = x, c(x) = c',
+    content: {
+      conceptBox: {
+        definitionName: '수평선 판별법 (Horizontal Line Test)',
+        mathFormula: '\\forall k \\in Y, \\quad |\\{ x \\in X \\mid f(x) = k \\}| \\le 1',
+        description: '공역의 임의의 실수 k에 대하여 x축에 평행한 수평선 y = k를 그었을 때, 그 수평선이 함수의 그래프와 기껏해야 한 점에서만 만나면 일대일함수이다. 만약 공역의 모든 k에 대해 정확히 한 점에서 만나면 일대일대응이다.',
+        keyPoints: [
+          '수평선과 2점 이상 만남 → 서로 다른 x값들이 동일한 y값을 공유하므로 일대일함수 탈락.',
+          '항등함수(Identity Function): I : X → X, I(x) = x. 모든 원소가 자기 자신에 대응.',
+          '상수함수(Constant Function): c : X → Y, c(x) = c. 정의역의 모든 원소가 공역의 단 하나의 원소에 몰빵 대응.',
+        ],
+      },
+      bodyParagraphs: [
+        '수직선 판별법(Vertical Line Test)은 "주어진 그래프가 함수인가?"를 판별하는 도구이고,',
+        '수평선 판별법(Horizontal Line Test)은 "주어진 함수가 일대일함수(또는 일대일대응)인가?"를 판별하는 도구입니다. 두 도구의 수학적 대상과 목적을 명확히 구별해야 합니다.',
+      ],
+      deepThinking: {
+        title: 'NCTM 다중 표상(Rule of Four) 관점 정리',
+        prompt: '함수를 언어적(Verbal: 각 x에 y가 하나씩), 수치적(Numerical: 표에서 x열과 y열의 짝), 시각적(Graphical: 수직선/수평선 검사), 대수적(Algebraic: f(x)=식)의 4가지 표상으로 동시에 바라보는 사고력을 길러야 합니다.',
+        academicLink: 'Harvard Calculus Consortium (Hughes-Hallett et al.)의 다중표상 교수법 모델',
+      },
+    },
+  },
+  {
+    pageNumber: 7,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '06. 합성함수(Composite Functions)의 원리와 연산',
+    pageType: 'concept',
+    kStemCompetencies: ['문제해결', '추론'],
+    title: '두 단계를 거치는 대응의 합성 f : X → Y, g : Y → Z',
+    subtitle: '(g ∘ f)(x) = g(f(x)) 연산의 순서와 합성 가능 조건',
+    content: {
+      conceptBox: {
+        definitionName: '합성함수의 정의와 성립 조건',
+        mathFormula: '(g \\circ f)(x) = g(f(x)), \\quad f(X) \\subseteq \\text{Domain}(g)',
+        description: '두 함수 f : X → Y 와 g : Y → Z 가 주어졌을 때, 집합 X의 각 원소 x에 집합 Z의 원소 g(f(x))를 대응시키는 새로운 함수를 f와 g의 합성함수라 하고, g ∘ f : X → Z 로 나타낸다.',
+        keyPoints: [
+          '기호 순서 주의: g ∘ f 는 f를 먼저 적용하고, 그 결과에 g를 나중에 적용한다.',
+          '합성 가능 조건: 앞선 함수 f의 치역 f(X)가 뒤따르는 함수 g의 정의역의 부분집합이어야 한다.',
+          '자판기 비유: 원자재 투입 → 중간 부품 완성 f(x) → 완제품 조립 g(f(x)).',
+        ],
+      },
+      bodyParagraphs: [
+        '함수의 합성은 프로그래밍에서의 파이프라인 연산자(Pipe: x |> f |> g)나 인공 신경망의 층간 순전파(Feed-forward)와 완전히 동일한 수학적 구조를 갖습니다.',
+        '합성함수를 연산할 때는 안쪽 함수 f(x)의 함숫값이 바깥 함수 g의 입력값(독립변수)으로 재해석된다는 점을 명확히 인지해야 합니다.',
+      ],
+      exampleProblem: {
+        question: '두 함수 f(x) = 2x + 1, g(x) = x² - 3 에 대하여 (g ∘ f)(2) 와 (f ∘ g)(2) 의 값을 각각 구하시오.',
+        solutionSteps: [
+          '1단계: (g ∘ f)(2) = g(f(2)) 입니다.',
+          '  f(2) = 2(2) + 1 = 5 이므로, g(f(2)) = g(5) = 5² - 3 = 25 - 3 = 22.',
+          '2단계: (f ∘ g)(2) = f(g(2)) 입니다.',
+          '  g(2) = 2² - 3 = 4 - 3 = 1 이므로, f(g(2)) = f(1) = 2(1) + 1 = 3.',
+          '3단계: 두 결과를 비교하면 (g ∘ f)(2) = 22 ≠ (f ∘ g)(2) = 3 입니다.',
+        ],
+        answer: '(g ∘ f)(2) = 22, (f ∘ g)(2) = 3',
+        practiceProblem: {
+          question: 'f(x) = 3x - 1, (f ∘ g)(x) = 6x + 5 일 때, 일차함수 g(x)를 구하시오.',
+          answer: 'g(x) = 2x + 2',
+          explanation: 'f(g(x)) = 3g(x) - 1 = 6x + 5 이므로 3g(x) = 6x + 6, 따라서 g(x) = 2x + 2 입니다.',
+        },
+      },
+    },
+  },
+  {
+    pageNumber: 8,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '07. 합성함수의 성질: 교환법칙과 결합법칙',
+    pageType: 'concept',
+    kStemCompetencies: ['추론', '의사소통'],
+    title: '일반적으로 교환법칙은 불성립, 결합법칙은 항상 성립',
+    subtitle: 'f ∘ g ≠ g ∘ f  (일반적)  vs  h ∘ (g ∘ f) = (h ∘ g) ∘ f',
+    content: {
+      conceptBox: {
+        definitionName: '합성함수의 주요 대수적 성질',
+        mathFormula: 'f \\circ g \\neq g \\circ f \\; (\\text{Non-commutative}), \\quad (h \\circ g) \\circ f = h \\circ (g \\circ f) \\; (\\text{Associative})',
+        description: '① 일반적으로 교환법칙은 성립하지 않는다: f ∘ g ≠ g ∘ f\n② 결합법칙은 항상 성립한다: (h ∘ g) ∘ f = h ∘ (g ∘ f)\n③ 항등함수 I와의 합성은 자기 자신이다: f ∘ I = I ∘ f = f',
+        keyPoints: [
+          '일상의 비유: 신발을 신고 양말을 신는 행위와, 양말을 신고 신발을 신는 행위는 완전히 다른 결과를 낳습니다 (순서의 중요성).',
+          '결합법칙이 성립하므로 세 함수의 합성 h ∘ g ∘ f 는 괄호 없이 자유롭게 쓸 수 있습니다.',
+          '예외적으로 f ∘ g = g ∘ f 가 성립하는 특수한 경우를 찾는 문제가 수능 기출에 자주 출제됩니다.',
+        ],
+      },
+      bodyParagraphs: [
+        '결합법칙의 증명은 매우 간결하지만 심오합니다. 임의의 원소 x에 대하여\n((h ∘ g) ∘ f)(x) = (h ∘ g)(f(x)) = h(g(f(x)))\n(h ∘ (g ∘ f))(x) = h((g ∘ f)(x)) = h(g(f(x)))\n두 결과가 모든 x에 대해 완전히 일치하므로 결합법칙이 성립함을 엄밀하게 증명할 수 있습니다.',
+      ],
+      deepThinking: {
+        title: 'Dubinsky의 APOS 이론 인지 발달 단계',
+        prompt: '학생이 f(g(x))를 계산할 때, 단순히 숫자를 집어넣는 단계(Action)에서 x라는 변수 자체의 흐름으로 인식하는 단계(Process)를 거쳐, g∘f라는 합성함수 자체를 독립된 수학적 조작 객체(Object)로 다룰 수 있어야 합니다.',
+        academicLink: 'Ed Dubinsky (1991), "Reflective Abstraction in Advanced Mathematical Thinking"',
+      },
+    },
+  },
+  {
+    pageNumber: 9,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '08. 역함수(Inverse Functions)의 정의와 존재 조건',
+    pageType: 'concept',
+    kStemCompetencies: ['문제해결', '추론'],
+    title: '거꾸로 되돌리는 사상 f⁻¹ : Y → X',
+    subtitle: '함수 f가 일대일대응일 때에만 역함수 f⁻¹가 존재한다는 수학적 필연성',
+    content: {
+      conceptBox: {
+        definitionName: '역함수의 정의와 존재 조건',
+        mathFormula: 'f^{-1}(y) = x \\iff f(x) = y \\quad (\\text{Condition: } f \\text{ is a Bijective function})',
+        description: '함수 f : X → Y 가 일대일대응일 때, 공역 Y의 각 원소 y에 대하여 f(x) = y 인 정의역 X의 유일한 원소 x를 대응시키는 함수를 f의 역함수라 하고 f⁻¹ : Y → X 로 나타낸다.',
+        keyPoints: [
+          '역함수 존재의 필요충분조건: f는 반드시 "일대일대응"이어야 한다.',
+          '만약 f가 일대일함수가 아니면 → 되돌아갈 때 하나의 y가 여러 x로 갈라지므로 함수가 아님.',
+          '만약 f의 치역과 공역이 다르면 → 화살표를 받지 못한 y는 되돌아갈 x가 없으므로 함수가 아님.',
+          '(f⁻¹ ∘ f)(x) = x,  (f ∘ f⁻¹)(y) = y  (원래 자리로 복귀)',
+          '(g ∘ f)⁻¹ = f⁻¹ ∘ g⁻¹  (양말과 신발을 벗을 때의 순서 역전)',
+        ],
+      },
+      bodyParagraphs: [
+        '역함수는 "암호화(Encryption)"와 "복호화(Decryption)"의 기본 원리입니다. 평문을 암호문으로 바꾸는 함수가 f라면, 암호문을 다시 원래의 평문으로 해독하는 알고리즘이 바로 역함수 f⁻¹입니다.',
+        '만약 두 개의 서로 다른 평문이 같은 암호문으로 바뀌거나(단사 실패), 어떤 암호문이 유효한 평문으로 복원되지 못한다면(전사 실패) 신뢰할 수 있는 암호 체계가 될 수 없습니다.',
+      ],
+      exampleProblem: {
+        question: '함수 f(x) = 3x - 6 의 역함수 f⁻¹(x)를 구하시오.',
+        solutionSteps: [
+          '1단계: y = f(x)로 놓습니다: y = 3x - 6',
+          '2단계: 이 식을 x에 대하여 정리합니다: 3x = y + 6  →  x = (1/3)y + 2',
+          '3단계: x와 y를 서로 바꾸어 독립변수를 x로 표현합니다: y = (1/3)x + 2',
+          '4단계: 따라서 f⁻¹(x) = (1/3)x + 2 입니다.',
+        ],
+        answer: 'f⁻¹(x) = (1/3)x + 2',
+        practiceProblem: {
+          question: 'f(2x + 1) = 4x - 3 일 때, f⁻¹(5) 의 값을 구하시오.',
+          answer: '5',
+          explanation: 'f⁻¹(5) = k 라 두면 f(k) = 5 입니다. 4x - 3 = 5 에서 4x = 8, x = 2. 이때 f의 입력값은 2x + 1 이므로 k = 2(2) + 1 = 5 입니다.',
+        },
+      },
+    },
+  },
+  {
+    pageNumber: 10,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '09. 역함수의 그래프와 직선 y = x 대칭의 기하학',
+    pageType: 'concept',
+    kStemCompetencies: ['추론', '창의·융합'],
+    title: '점 (a, b)와 점 (b, a)의 선대칭 관계',
+    subtitle: '원래 함수 y = f(x)와 역함수 y = f⁻¹(x)의 그래프 대칭성과 교점의 비밀',
+    content: {
+      conceptBox: {
+        definitionName: '역함수 그래프의 기하학적 대칭성',
+        mathFormula: '(a, b) \\in \\text{Graph}(f) \\iff (b, a) \\in \\text{Graph}(f^{-1})',
+        description: '함수 y = f(x)의 그래프 위의 임의의 점 (a, b)에 대하여, 그 역함수 y = f⁻¹(x)는 반드시 점 (b, a)를 지난다. 점 (a, b)와 점 (b, a)는 직선 y = x에 대하여 대칭이므로, 두 함수의 그래프는 직선 y = x에 대하여 대칭이다.',
+        keyPoints: [
+          '핵심 성질: 함수 y = f(x)와 역함수 y = f⁻¹(x)의 그래프는 직선 y = x에 대하여 대칭이다.',
+          '교점의 성질 (증가함수): f(x)가 증가함수일 때, f(x)와 f⁻¹(x)의 모든 교점은 반드시 직선 y = x 위에 존재한다.',
+          '주의할 오개념 (감소함수): f(x)가 감소함수일 때는 y = x 선상 외에도 점 (p, q)와 (q, p)의 대칭 쌍으로 교점이 존재할 수 있다 (수능 킬러 단골 출제 포인트).',
+        ],
+      },
+      bodyParagraphs: [
+        '역함수의 그래프를 직접 그리지 않고도 f(x)와 직선 y = x의 방정식을 연립하여 풀 수 있는 것은 바로 이 대칭성 때문입니다.',
+        '기출 문제에서 "f(x)와 f⁻¹(x)의 교점 사이의 거리"를 묻는다면, 번거롭게 f⁻¹(x)의 식을 구하지 말고 f(x) = x 의 근을 구하는 것이 핵심 전략입니다.',
+      ],
+      deepThinking: {
+        title: 'Covariational Reasoning(동시변화 추론) 적용',
+        prompt: '독립변수 x가 일정한 속도로 증가할 때, 원래 함수 f(x)의 y값 변화 속도와 역함수 f⁻¹(x)의 y값 변화 속도가 어떻게 역수 관계로 상호작용하는지 관찰해보세요.',
+        academicLink: 'Marilyn Carlson et al. (2002), "Applying covariational reasoning while modeling dynamic events"',
+      },
+    },
+  },
+  {
+    pageNumber: 11,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '10. 공학 도구 활용: 인터랙티브 함수 변환 실험실',
+    pageType: 'interactive_lab',
+    kStemCompetencies: ['정보처리', '문제해결', '창의·융합'],
+    title: '파라미터 조작으로 탐구하는 함수 변환 y = a · f(b(x - c)) + d',
+    subtitle: '대칭이동, 평행이동, 주기와 진폭의 변화를 실시간 인터랙티브 시각화로 체득하기',
+    content: {
+      conceptBox: {
+        definitionName: '함수의 일반적 변환 원리',
+        mathFormula: 'y = a \\cdot f(b(x - c)) + d',
+        description: '① a (세로 신축/상하 반전): y축 방향으로 |a|배 확대/축소, a < 0이면 x축 대칭\n② b (가로 신축/좌우 반전): x축 방향으로 1/|b|배 압축/팽창, b < 0이면 y축 대칭\n③ c (가로 평행이동): x축 방향으로 c만큼 평행이동\n④ d (세로 평행이동): y축 방향으로 d만큼 평행이동',
+        keyPoints: [
+          '공학 도구(GeoGebra, Desmos) 슬라이더를 조작하여 파라미터 a, b, c, d가 그래프 형상에 미치는 영향을 직관적으로 확인합니다.',
+          '직선 y = x 버튼을 토글하여 역함수 대칭 곡선을 실시간으로 렌더링할 수 있습니다.',
+          '수평선(Horizontal Line) 검사기를 활성화하여 일대일함수 여부를 즉각 테스트할 수 있습니다.',
+        ],
+      },
+      bodyParagraphs: [
+        '디지털 교과서 내장 "함수 실험실" 컴포넌트를 통해 다항함수, 무리함수, 유리함수, 지수함수 등 다양한 원형 함수(Parent Function)를 자유롭게 선택하고 실시간 동적 그래프를 조작해보세요.',
+      ],
+      interactiveTool: 'function_explorer',
+    },
+  },
+  {
+    pageNumber: 12,
+    unitId: 'functions',
+    chapterTitle: 'Ⅱ. 함수 (Functions)',
+    sectionTitle: '11. 수학 역량 플러스 & 단원 총정리',
+    pageType: 'pedagogy',
+    kStemCompetencies: ['창의·융합', '의사소통', '태도및실천'],
+    title: '글로벌 교수법으로 정리하는 고교 2학년 함수 마인드맵',
+    subtitle: 'Rule of Four, APOS, Covariational Reasoning으로 완성하는 수능 및 논술 역량',
+    content: {
+      conceptBox: {
+        definitionName: '함수 단원 4대 핵심 역량 도달 지표',
+        mathFormula: '\\text{Algebraic} \\iff \\text{Graphical} \\iff \\text{Numerical} \\iff \\text{Verbal}',
+        description: '함수의 기본 성질을 이해하고, 다양한 다중 표상(식, 그래프, 표, 언어) 간의 유연한 상호 전환 능력을 발휘하여 낯선 복합 문제를 해결할 수 있는가?',
+        keyPoints: [
+          '개념 이해: 정의역·공역·치역의 엄밀한 구분 및 함수의 성립 요건 설명 가능 여부',
+          '추론 능력: 일대일대응 판별 및 역함수 존재의 필요충분조건 증명 가능 여부',
+          '대수적 조작: 합성함수의 결합법칙 및 역함수 연산 공식의 정확한 계산력',
+          '다중표상 융합: 그래프의 y = x 대칭성과 평행·대칭이동을 기하학적으로 연계하는 직관력',
+        ],
+      },
+      bodyParagraphs: [
+        '이제 학습한 내용을 바탕으로 "수준별 평가 센터"에 접속하여 Level 1 기초부터 Level 4 최고난도 기출 문제까지 도전해보세요.',
+        '학습자 식별(학년, 반, 번호, 이름 및 자동 접속 단말기 지문)을 통해 여러분의 취약 역량을 정밀 진단하고 맞춤형 해외 교수법 피드백 처방전을 도출해 드립니다.',
+      ],
+      deepThinking: {
+        title: '수학사 성찰: 오일러에서 부르바키까지',
+        prompt: '18세기 오일러가 "해석적 표현식"으로 정의했던 함수가 20세기 부르바키에 의해 "순서쌍의 곱집합 부분집합"이라는 관계(Relation)로 탈바꿈한 역사적 이유를 생각해보세요.',
+        academicLink: 'Nicolas Bourbaki (1939), "Éléments de mathématique: Théorie des ensembles"',
+      },
+    },
+  },
+];

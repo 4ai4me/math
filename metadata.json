@@ -1,0 +1,6 @@
+{
+  "name": "K-STEM 2026 고교 2학년 수학 디지털 교과서: 함수 탐구 & 지능형 평가 시스템",
+  "description": "2026 K-STEM 디지털 교과서 포맷 기반 고등학교 2학년 수학 '함수' 대단원 e-교과서. 해외 수학교육 교수법(Rule of Four, APOS, Covariational Reasoning), 저명 수학자 및 논문 아카이브, 인터랙티브 함수 실험실, 수준별(1~4단계) 기출 평가 및 비회원 단말기/IP 기반 자동 진단 리포트 제공.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
