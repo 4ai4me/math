@@ -34,7 +34,7 @@ interface TextbookViewerProps {
   initialPage?: number;
 }
 
-export type FlipAnimationType = '3d-flip' | 'slide' | 'fade';
+export type FlipAnimationType = 'page-flip' | 'slide' | 'fade' | '3d-flip';
 
 export const TextbookViewer: React.FC<TextbookViewerProps> = ({
   onOpenExam,
@@ -44,7 +44,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(initialPage);
   const [viewMode, setViewMode] = useState<PageViewMode>('double');
-  const [flipAnimation, setFlipAnimation] = useState<FlipAnimationType>('3d-flip');
+  const [flipAnimation, setFlipAnimation] = useState<FlipAnimationType>('page-flip');
   const [flipDirection, setFlipDirection] = useState<number>(1); // 1 = forward, -1 = backward
   const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(true);
   const [zoomLevel, setZoomLevel] = useState<number>(100);
@@ -285,48 +285,136 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({
       )
     : [];
 
-  // Motion variants for Page Flip Animation
-  const getPageVariants = (direction: number) => {
-    if (flipAnimation === '3d-flip') {
+  // Motion variants for Natural Book Page Leaves (Left, Right, Single)
+  const getLeftPageVariants = (direction: number) => {
+    if (flipAnimation === 'page-flip' || flipAnimation === '3d-flip') {
       return {
         initial: {
-          rotateY: direction > 0 ? 35 : -35,
-          opacity: 0.4,
-          scale: 0.98,
-          filter: 'drop-shadow(0 25px 25px rgba(0,0,0,0.6))',
+          rotateY: direction < 0 ? -24 : 0,
+          opacity: direction < 0 ? 0.75 : 0.88,
+          scale: 0.99,
+          filter: 'brightness(0.95)',
         },
         animate: {
           rotateY: 0,
           opacity: 1,
           scale: 1,
-          filter: 'drop-shadow(0 15px 15px rgba(0,0,0,0.4))',
+          filter: 'brightness(1)',
           transition: {
-            duration: 0.52,
-            ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+            duration: 0.36,
+            ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
           },
         },
         exit: {
-          rotateY: direction > 0 ? -35 : 35,
-          opacity: 0.2,
-          scale: 0.98,
+          rotateY: direction > 0 ? -16 : 0,
+          opacity: 0.6,
+          scale: 0.99,
           transition: {
-            duration: 0.42,
-            ease: [0.4, 0, 0.7, 0.2] as [number, number, number, number],
+            duration: 0.28,
+            ease: [0.32, 0, 0.67, 0] as [number, number, number, number],
           },
         },
       };
     } else if (flipAnimation === 'slide') {
       return {
-        initial: { x: direction > 0 ? 80 : -80, opacity: 0 },
-        animate: { x: 0, opacity: 1, transition: { duration: 0.35, ease: 'easeOut' as const } },
-        exit: { x: direction > 0 ? -80 : 80, opacity: 0, transition: { duration: 0.25, ease: 'easeIn' as const } },
+        initial: { x: direction > 0 ? 30 : -30, opacity: 0 },
+        animate: { x: 0, opacity: 1, transition: { duration: 0.28, ease: 'easeOut' as const } },
+        exit: { x: direction > 0 ? -30 : 30, opacity: 0, transition: { duration: 0.22, ease: 'easeIn' as const } },
       };
     } else {
-      // Fade
       return {
         initial: { opacity: 0 },
-        animate: { opacity: 1, transition: { duration: 0.25 } },
-        exit: { opacity: 0, transition: { duration: 0.2 } },
+        animate: { opacity: 1, transition: { duration: 0.2 } },
+        exit: { opacity: 0, transition: { duration: 0.16 } },
+      };
+    }
+  };
+
+  const getRightPageVariants = (direction: number) => {
+    if (flipAnimation === 'page-flip' || flipAnimation === '3d-flip') {
+      return {
+        initial: {
+          rotateY: direction > 0 ? 24 : 0,
+          opacity: direction > 0 ? 0.75 : 0.88,
+          scale: 0.99,
+          filter: 'brightness(0.95)',
+        },
+        animate: {
+          rotateY: 0,
+          opacity: 1,
+          scale: 1,
+          filter: 'brightness(1)',
+          transition: {
+            duration: 0.36,
+            ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+          },
+        },
+        exit: {
+          rotateY: direction < 0 ? 16 : 0,
+          opacity: 0.6,
+          scale: 0.99,
+          transition: {
+            duration: 0.28,
+            ease: [0.32, 0, 0.67, 0] as [number, number, number, number],
+          },
+        },
+      };
+    } else if (flipAnimation === 'slide') {
+      return {
+        initial: { x: direction > 0 ? 30 : -30, opacity: 0 },
+        animate: { x: 0, opacity: 1, transition: { duration: 0.28, ease: 'easeOut' as const } },
+        exit: { x: direction > 0 ? -30 : 30, opacity: 0, transition: { duration: 0.22, ease: 'easeIn' as const } },
+      };
+    } else {
+      return {
+        initial: { opacity: 0 },
+        animate: { opacity: 1, transition: { duration: 0.2 } },
+        exit: { opacity: 0, transition: { duration: 0.16 } },
+      };
+    }
+  };
+
+  const getSinglePageVariants = (direction: number) => {
+    if (flipAnimation === 'page-flip' || flipAnimation === '3d-flip') {
+      return {
+        initial: {
+          x: direction > 0 ? 32 : -32,
+          rotateY: direction > 0 ? -12 : 12,
+          opacity: 0.65,
+          scale: 0.98,
+        },
+        animate: {
+          x: 0,
+          rotateY: 0,
+          opacity: 1,
+          scale: 1,
+          transition: {
+            duration: 0.34,
+            ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
+          },
+        },
+        exit: {
+          x: direction > 0 ? -32 : 32,
+          rotateY: direction > 0 ? 12 : -12,
+          opacity: 0.4,
+          scale: 0.98,
+          transition: {
+            duration: 0.26,
+            ease: [0.32, 0, 0.67, 0] as [number, number, number, number],
+          },
+        },
+      };
+    } else if (flipAnimation === 'slide') {
+      return {
+        initial: { x: direction > 0 ? 50 : -50, opacity: 0 },
+        animate: { x: 0, opacity: 1, transition: { duration: 0.28, ease: 'easeOut' as const } },
+        exit: { x: direction > 0 ? -50 : 50, opacity: 0, transition: { duration: 0.22, ease: 'easeIn' as const } },
+      };
+    } else {
+      return {
+        initial: { opacity: 0 },
+        animate: { opacity: 1, transition: { duration: 0.2 } },
+        exit: { opacity: 0, transition: { duration: 0.16 } },
       };
     }
   };
@@ -341,7 +429,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({
           : ''
       }`}
     >
-      {/* 3D Paper Texture & Gutter Shadow */}
+      {/* Paper Texture & Gutter Spine Shadow */}
       <div
         className={`absolute inset-0 pointer-events-none z-10 ${
           viewMode === 'double'
@@ -704,20 +792,20 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({
           </button>
         </div>
 
-        {/* Right: Digital Tools (Highlighter, Sticky Note, 3D Flip Effects, Sound, View Mode, Zoom) */}
+        {/* Right: Digital Tools (Highlighter, Sticky Note, Natural Page Flip, Sound, View Mode, Zoom) */}
         <div className="flex items-center gap-2">
           {/* Flip Animation Mode Selector */}
           <div className="flex items-center gap-1 bg-stone-950/80 px-2 py-1 rounded-xl border border-stone-800">
             <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400 hidden sm:inline" />
             <select
-              value={flipAnimation}
+              value={flipAnimation === '3d-flip' ? 'page-flip' : flipAnimation}
               onChange={(e) => setFlipAnimation(e.target.value as FlipAnimationType)}
               className="bg-transparent text-stone-300 font-medium text-[11px] focus:outline-none cursor-pointer"
               title="책장 넘김 효과 선택"
             >
-              <option value="3d-flip" className="bg-stone-900 text-stone-100">3D 책장 넘김</option>
-              <option value="slide" className="bg-stone-900 text-stone-100">슬라이드 넘김</option>
-              <option value="fade" className="bg-stone-900 text-stone-100">페이드 전환</option>
+              <option value="page-flip" className="bg-stone-900 text-stone-100">자연스러운 책장 넘김</option>
+              <option value="slide" className="bg-stone-900 text-stone-100">부드러운 슬라이드</option>
+              <option value="fade" className="bg-stone-900 text-stone-100">부드러운 페이드</option>
             </select>
           </div>
 
@@ -960,17 +1048,17 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({
         </div>
       )}
 
-      {/* ================= 3D EBOOK SPREAD STAGE ================= */}
+      {/* ================= NATURAL EBOOK SPREAD STAGE ================= */}
       <div
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className="relative w-full overflow-hidden flex items-center justify-center py-2 [perspective:2400px] touch-pan-y"
+        className="relative w-full overflow-hidden flex items-center justify-center py-2 [perspective:2200px] touch-pan-y"
       >
         {/* Floating Quick Flip Arrows for Desktop */}
         <button
           disabled={currentPage <= 1}
           onClick={goToPrev}
-          className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-16 rounded-r-2xl bg-stone-900/90 hover:bg-amber-500 hover:text-stone-950 text-stone-400 border border-stone-700/80 shadow-2xl items-center justify-center transition-all disabled:opacity-0 disabled:pointer-events-none group"
+          className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-16 rounded-r-2xl bg-stone-900/90 hover:bg-amber-500 hover:text-stone-950 text-stone-400 border border-stone-700/80 shadow-2xl items-center justify-center transition-all disabled:opacity-0 disabled:pointer-events-none group cursor-pointer"
           title="이전 쪽으로 넘기기"
         >
           <ChevronLeft className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" />
@@ -979,7 +1067,7 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({
         <button
           disabled={currentPage >= totalPages}
           onClick={goToNext}
-          className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-16 rounded-l-2xl bg-stone-900/90 hover:bg-amber-500 hover:text-stone-950 text-stone-400 border border-stone-700/80 shadow-2xl items-center justify-center transition-all disabled:opacity-0 disabled:pointer-events-none group"
+          className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-16 rounded-l-2xl bg-stone-900/90 hover:bg-amber-500 hover:text-stone-950 text-stone-400 border border-stone-700/80 shadow-2xl items-center justify-center transition-all disabled:opacity-0 disabled:pointer-events-none group cursor-pointer"
           title="다음 쪽으로 넘기기"
         >
           <ChevronRight className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" />
@@ -995,41 +1083,74 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({
           />
         )}
 
-        {/* Animated 3D Book Stage */}
+        {/* Natural Book Desk Stage */}
         <div
           className="w-full flex justify-center [transform-style:preserve-3d]"
           style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }}
         >
-          <AnimatePresence mode="wait" custom={flipDirection}>
-            <motion.div
-              key={`${currentPage}-${viewMode}`}
-              custom={flipDirection}
-              variants={getPageVariants(flipDirection)}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className={`w-full relative [transform-style:preserve-3d] ${
-                viewMode === 'double'
-                  ? 'grid grid-cols-1 lg:grid-cols-2 max-w-6xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] rounded-2xl bg-stone-950/60 p-1'
-                  : 'max-w-3xl mx-auto'
-              }`}
-            >
+          {viewMode === 'double' ? (
+            <div className="w-full max-w-6xl relative rounded-2xl bg-stone-950/80 border border-stone-800/80 p-1 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] grid grid-cols-1 lg:grid-cols-2 [transform-style:preserve-3d]">
               {/* Realistic Book Spine Center Crease (양면 제본 중심선) */}
-              {viewMode === 'double' && displayedPages.length === 2 && (
-                <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-6 -translate-x-1/2 z-20 pointer-events-none">
-                  {/* Spine Depth Gradients */}
-                  <div className="w-full h-full bg-gradient-to-r from-black/50 via-stone-800/60 to-black/50 shadow-inner" />
-                  <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-stone-700/60 -translate-x-1/2" />
-                </div>
-              )}
+              <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-8 -translate-x-1/2 z-20 pointer-events-none">
+                <div className="w-full h-full bg-gradient-to-r from-black/60 via-stone-800/70 to-black/60 shadow-inner" />
+                <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-stone-700/60 -translate-x-1/2" />
+              </div>
 
-              {/* Left Page (or Single Page) */}
-              {displayedPages[0] && renderPageContent(displayedPages[0], true)}
+              {/* Left Page Leaf */}
+              <div className="w-full h-full relative [transform-style:preserve-3d]" style={{ perspective: '1600px' }}>
+                <AnimatePresence mode="popLayout" custom={flipDirection}>
+                  <motion.div
+                    key={`left-${displayedPages[0]?.pageNumber || 'none'}`}
+                    custom={flipDirection}
+                    variants={getLeftPageVariants(flipDirection)}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    className="w-full h-full relative [transform-style:preserve-3d]"
+                    style={{ transformOrigin: 'right center' }}
+                  >
+                    {displayedPages[0] && renderPageContent(displayedPages[0], true)}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
 
-              {/* Right Page (if Double Spread) */}
-              {viewMode === 'double' && displayedPages[1] && renderPageContent(displayedPages[1], false)}
-            </motion.div>
-          </AnimatePresence>
+              {/* Right Page Leaf */}
+              <div className="w-full h-full relative [transform-style:preserve-3d]" style={{ perspective: '1600px' }}>
+                <AnimatePresence mode="popLayout" custom={flipDirection}>
+                  <motion.div
+                    key={`right-${displayedPages[1]?.pageNumber || 'none'}`}
+                    custom={flipDirection}
+                    variants={getRightPageVariants(flipDirection)}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    className="w-full h-full relative [transform-style:preserve-3d]"
+                    style={{ transformOrigin: 'left center' }}
+                  >
+                    {displayedPages[1] && renderPageContent(displayedPages[1], false)}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+          ) : (
+            /* Single Page (Mobile / Narrow) */
+            <div className="w-full max-w-3xl mx-auto relative [perspective:1600px]">
+              <AnimatePresence mode="popLayout" custom={flipDirection}>
+                <motion.div
+                  key={`single-${displayedPages[0]?.pageNumber || 'none'}`}
+                  custom={flipDirection}
+                  variants={getSinglePageVariants(flipDirection)}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  className="w-full relative [transform-style:preserve-3d]"
+                  style={{ transformOrigin: flipDirection > 0 ? 'left center' : 'right center' }}
+                >
+                  {displayedPages[0] && renderPageContent(displayedPages[0], false)}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </div>
 

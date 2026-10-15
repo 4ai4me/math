@@ -2,11 +2,40 @@ import React, { useState } from 'react';
 import { OVERSEAS_PEDAGOGIES } from '../data/pedagogies';
 import { PedagogyFramework, OverseasPedagogy } from '../types';
 import { MathView } from './MathView';
-import { Globe, BookOpen, Layers, Lightbulb, CheckCircle2, ArrowRight, Sparkles, HelpCircle } from 'lucide-react';
+import {
+  Globe,
+  BookOpen,
+  Layers,
+  Lightbulb,
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
+  AlertTriangle,
+  RotateCcw,
+  Check,
+  ChevronRight,
+} from 'lucide-react';
 
-export const PedagogyExplorer: React.FC = () => {
-  const [selectedPedagogyId, setSelectedPedagogyId] = useState<PedagogyFramework>('rule_of_four');
+interface PedagogyExplorerProps {
+  initialPedagogyId?: PedagogyFramework;
+}
+
+export const PedagogyExplorer: React.FC<PedagogyExplorerProps> = ({
+  initialPedagogyId = 'rule_of_four',
+}) => {
+  const [selectedPedagogyId, setSelectedPedagogyId] = useState<PedagogyFramework>(initialPedagogyId);
   const [activeSquareTab, setActiveSquareTab] = useState<'verbal' | 'numerical' | 'graphical' | 'algebraic'>('verbal');
+
+  // Singapore CPA Interactive Studio State
+  const [cpaStage, setCpaStage] = useState<'concrete' | 'pictorial' | 'abstract'>('concrete');
+  const [vendingSelection, setVendingSelection] = useState<number | null>(null);
+  const [vendingErrorMode, setVendingErrorMode] = useState<boolean>(false);
+
+  // APOS Interactive State
+  const [aposStep, setAposStep] = useState<number>(1);
+
+  // Tall & Vinner Cognitive Conflict State
+  const [conflictCase, setConflictCase] = useState<'constant' | 'piecewise' | 'circle'>('constant');
 
   const selectedPedagogy: OverseasPedagogy =
     OVERSEAS_PEDAGOGIES.find((p) => p.id === selectedPedagogyId) || OVERSEAS_PEDAGOGIES[0];
@@ -15,35 +44,43 @@ export const PedagogyExplorer: React.FC = () => {
     <div className="space-y-6">
       {/* Header Banner */}
       <div className="bg-gradient-to-r from-stone-900 via-indigo-950/70 to-stone-900 border border-indigo-800/40 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-        <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:16px_16px]" />
-        <div className="flex items-center gap-2.5 text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-2">
+        {/* Background decorative dots with pointer-events-none so it NEVER intercepts clicks */}
+        <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 bg-[radial-gradient(#6366f1_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+
+        <div className="flex items-center gap-2.5 text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-2 relative z-10">
           <Globe className="w-4 h-4" />
           <span>Global Mathematics Didactics & Research</span>
         </div>
-        <h2 className="text-2xl font-extrabold text-stone-100">
+        <h2 className="text-2xl font-extrabold text-stone-100 relative z-10">
           해외 수학교육계의 함수 교수법(Pedagogies) 심층 탐구
         </h2>
-        <p className="mt-2 text-stone-300 text-sm max-w-3xl leading-relaxed">
+        <p className="mt-2 text-stone-300 text-sm max-w-3xl leading-relaxed relative z-10">
           미국 NCTM, 하버드 대학 미적분학 컨소시엄, 피아제 구성주의 기반 APOS 이론, 영국 Tall & Vinner의 개념 심상론,
           싱가포르의 CPA 단계 지도법 등 세계 주요 선진 수학교육 모델이 함수를 어떻게 가르치는지 비교 분석합니다.
         </p>
 
-        {/* Framework Selector Pills */}
-        <div className="mt-5 flex flex-wrap gap-2">
-          {OVERSEAS_PEDAGOGIES.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => setSelectedPedagogyId(p.id)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 ${
-                selectedPedagogyId === p.id
-                  ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/30 ring-2 ring-indigo-400/50'
-                  : 'bg-stone-800/80 hover:bg-stone-700/80 text-stone-300'
-              }`}
-            >
-              <span>{p.name.split(' (')[0]}</span>
-              <span className="text-[10px] opacity-75">({p.originCountry.split(' (')[0]})</span>
-            </button>
-          ))}
+        {/* Framework Selector Pills - Fully Clickable & Highlighted */}
+        <div className="mt-5 flex flex-wrap gap-2.5 relative z-20">
+          {OVERSEAS_PEDAGOGIES.map((p) => {
+            const isSelected = selectedPedagogyId === p.id;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setSelectedPedagogyId(p.id)}
+                className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer select-none relative z-20 shadow-sm ${
+                  isSelected
+                    ? 'bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-600/40 ring-2 ring-indigo-400 ring-offset-2 ring-offset-stone-900 scale-[1.02]'
+                    : 'bg-stone-800/90 hover:bg-stone-700 text-stone-300 hover:text-white border border-stone-700/60'
+                }`}
+              >
+                <span className="pointer-events-none">{p.name.split(' (')[0]}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-stone-900/60 font-mono opacity-80 pointer-events-none">
+                  {p.originCountry.split(' (')[0]}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -126,153 +163,490 @@ export const PedagogyExplorer: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Interactive Rule of Four Studio & Concept Image Simulator */}
+        {/* Right: Dynamic Interactive Studio for Selected Pedagogy */}
         <div className="lg:col-span-5 space-y-5">
-          <div className="bg-stone-900 border border-stone-800 rounded-2xl p-5 shadow-lg">
-            <div className="flex items-center justify-between pb-3 border-b border-stone-800">
-              <h3 className="text-sm font-bold text-stone-100 flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-amber-400" />
-                하버드 Rule of Four 다중 표상 실습기
-              </h3>
-              <span className="text-[10px] text-stone-400">함수: f(x) = 2x - 3</span>
-            </div>
+          {/* 1. Singapore CPA Interactive Studio */}
+          {selectedPedagogyId === 'cpa_model' && (
+            <div className="bg-stone-900 border border-indigo-700/60 rounded-2xl p-5 shadow-2xl relative">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+                <h3 className="text-sm font-bold text-stone-100 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  싱가포르 CPA 단계별 인터랙티브 실습실
+                </h3>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/60 font-mono">
+                  Singapore Math
+                </span>
+              </div>
 
-            <p className="text-xs text-stone-400 mt-2">
-              하나의 수학적 함수가 4가지 표상 체계(Verbal, Numerical, Graphical, Algebraic)로 어떻게 번역되는지 직접 확인해보세요.
-            </p>
-
-            {/* 4 Tabs */}
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              {[
-                { id: 'verbal', label: '1. 언어적 (Verbal)' },
-                { id: 'numerical', label: '2. 수치적 (Table)' },
-                { id: 'graphical', label: '3. 시각적 (Graph)' },
-                { id: 'algebraic', label: '4. 대수적 (Formula)' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveSquareTab(tab.id as any)}
-                  className={`p-2 rounded-lg text-xs font-medium text-left transition-all ${
-                    activeSquareTab === tab.id
-                      ? 'bg-amber-500 text-stone-950 font-bold shadow-md'
-                      : 'bg-stone-950 text-stone-300 hover:bg-stone-800'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Display Area for Active Representation */}
-            <div className="mt-4 bg-stone-950 p-4 rounded-xl border border-stone-800 min-h-[220px] flex flex-col justify-center">
-              {activeSquareTab === 'verbal' && (
-                <div className="space-y-3 text-xs">
-                  <div className="flex items-center gap-2 text-amber-400 font-bold">
-                    <span>자연어 맥락 묘사</span>
-                  </div>
-                  <blockquote className="p-3 rounded-lg bg-stone-900 border-l-4 border-amber-500 text-stone-200 italic leading-relaxed">
-                    "주차장에 차를 주차할 때, 기본요금 3000원이 할인되고 1시간마다 2000원씩 요금이 부과된다. 이때 총 주차비는 주차 시간 x의 일차함수 관계를 갖는다."
-                  </blockquote>
-                  <p className="text-stone-400 text-[11px]">
-                    ★ 학생에게 식을 외우게 하기 전, 실세계의 원인(시간 x)과 결과(비용 y)의 인과성을 언어로 기술하게 함으로써 수학의 추상성을 탈피시킵니다.
-                  </p>
-                </div>
-              )}
-
-              {activeSquareTab === 'numerical' && (
-                <div className="space-y-3 text-xs">
-                  <div className="flex items-center justify-between text-amber-400 font-bold">
-                    <span>수치 데이터 테이블</span>
-                    <span className="text-[10px] text-stone-400">Δx = 1 ➔ Δy = +2</span>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-center border-collapse text-xs">
-                      <thead>
-                        <tr className="bg-stone-900 text-stone-400 border-b border-stone-800">
-                          <th className="py-1.5 px-2">x (입력)</th>
-                          <th className="py-1.5 px-2">-1</th>
-                          <th className="py-1.5 px-2">0</th>
-                          <th className="py-1.5 px-2">1</th>
-                          <th className="py-1.5 px-2">2</th>
-                          <th className="py-1.5 px-2">3</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr className="text-stone-200">
-                          <td className="py-1.5 px-2 font-bold text-amber-400">y (출력)</td>
-                          <td className="py-1.5 px-2">-5</td>
-                          <td className="py-1.5 px-2">-3</td>
-                          <td className="py-1.5 px-2">-1</td>
-                          <td className="py-1.5 px-2">1</td>
-                          <td className="py-1.5 px-2">3</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <p className="text-stone-400 text-[11px]">
-                    ★ 모든 y값이 중복 없이 2씩 일정하게 증가함을 관찰하여 일대일함수(Injective)임을 수치적으로 직접 확인합니다.
-                  </p>
-                </div>
-              )}
-
-              {activeSquareTab === 'graphical' && (
-                <div className="space-y-3 text-xs">
-                  <div className="flex items-center justify-between text-amber-400 font-bold">
-                    <span>좌표평면 시각 기하학</span>
-                    <span className="text-[10px] text-stone-400">기울기 2, y절편 -3</span>
-                  </div>
-                  <div className="h-32 bg-stone-900 rounded-lg flex items-center justify-center border border-stone-800 relative overflow-hidden">
-                    <svg viewBox="0 0 200 100" className="w-full h-full">
-                      {/* Axes */}
-                      <line x1="10" y1="50" x2="190" y2="50" stroke="#57534e" strokeWidth="1" />
-                      <line x1="100" y1="10" x2="100" y2="90" stroke="#57534e" strokeWidth="1" />
-                      {/* Line y = 2x - 3 */}
-                      <line x1="40" y1="90" x2="140" y2="10" stroke="#f59e0b" strokeWidth="2.5" />
-                      {/* Horizontal test line */}
-                      <line x1="10" y1="35" x2="190" y2="35" stroke="#ec4899" strokeWidth="1" strokeDasharray="3 3" />
-                      <circle cx="115" cy="35" r="3.5" fill="#ec4899" stroke="#fff" />
-                    </svg>
-                  </div>
-                  <p className="text-stone-400 text-[11px]">
-                    ★ 수직선 판별법(오직 한 점에서 만남 ➔ 함수)과 수평선 판별법(오직 한 점에서 만남 ➔ 일대일대응 ➔ 역함수 존재)을 동시에 검증합니다.
-                  </p>
-                </div>
-              )}
-
-              {activeSquareTab === 'algebraic' && (
-                <div className="space-y-3 text-xs">
-                  <div className="flex items-center justify-between text-amber-400 font-bold">
-                    <span>대수적 기호 체계 & 역함수 연산</span>
-                  </div>
-                  <div className="p-3 bg-stone-900 rounded-lg border border-stone-800 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-stone-400">원래 함수:</span>
-                      <MathView math="f(x) = 2x - 3" className="text-amber-300 font-bold" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-stone-400">역함수 변환:</span>
-                      <MathView math="x = \frac{y + 3}{2} \implies f^{-1}(x) = \frac{1}{2}x + \frac{3}{2}" className="text-purple-300 font-mono text-xs" />
-                    </div>
-                    <div className="flex items-center justify-between text-[11px] pt-1 border-t border-stone-800">
-                      <span className="text-stone-400">합성 확인:</span>
-                      <MathView math="(f^{-1} \circ f)(x) = x" className="text-emerald-400 font-mono" />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Cognitive Conflict Note */}
-            <div className="mt-4 p-3 rounded-xl bg-indigo-950/40 border border-indigo-800/40 text-xs">
-              <span className="font-bold text-indigo-300 flex items-center gap-1 mb-1">
-                <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
-                Tall & Vinner의 오개념 교정 팁
-              </span>
-              <p className="text-stone-300 text-[11px] leading-relaxed">
-                학생들이 "공식만 외우고 그래프를 못 그린다"거나 "그래프는 보는데 수식으로 못 푼다"는 현상은
-                표상 간의 단절 때문입니다. 4분할 시트를 통해 각 표상을 자유자재로 넘나드는 훈련이 수능 고난도 문제해결의 열쇠입니다.
+              <p className="text-xs text-stone-400 mt-2">
+                구체물(Concrete) → 시각 도식(Pictorial) → 추상 기호(Abstract) 순서로 조작하며 함수의 본질을 체감해보세요.
               </p>
+
+              {/* 3 CPA Tabs */}
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                {[
+                  { id: 'concrete', label: '1. C (구체물 실물)' },
+                  { id: 'pictorial', label: '2. P (시각 도식)' },
+                  { id: 'abstract', label: '3. A (추상 기호)' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setCpaStage(tab.id as any)}
+                    className={`p-2 rounded-lg text-xs font-bold text-center transition-all cursor-pointer ${
+                      cpaStage === tab.id
+                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 ring-2 ring-emerald-400/50'
+                        : 'bg-stone-950 text-stone-400 hover:bg-stone-800 hover:text-stone-200'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab 1: Concrete (Interactive Function Vending Machine) */}
+              {cpaStage === 'concrete' && (
+                <div className="mt-4 bg-stone-950 p-4 rounded-xl border border-stone-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-400">
+                      실물 조작: 함수 자판기 (Function Machine)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setVendingSelection(null);
+                        setVendingErrorMode(false);
+                      }}
+                      className="text-[11px] text-stone-500 hover:text-stone-300 flex items-center gap-1 cursor-pointer"
+                    >
+                      <RotateCcw className="w-3 h-3" /> 초기화
+                    </button>
+                  </div>
+
+                  <p className="text-[11px] text-stone-400 leading-relaxed">
+                    자판기 번호 버튼을 직접 눌러보세요. 입력 번호(정의역) 1개에 출력 음료(치역) 1개가 나오는 정상 원리와 오류 상황을 직접 조작합니다.
+                  </p>
+
+                  {/* Vending Machine Display */}
+                  <div className="bg-stone-900 border-2 border-stone-700 rounded-xl p-3 shadow-inner">
+                    <div className="text-[11px] text-stone-400 mb-2 font-mono text-center">
+                      [자판기 버튼 선택기 - 번호를 클릭하세요]
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { num: 1, name: '포도 주스', icon: '🍇', price: '₩1,200' },
+                        { num: 2, name: '시원한 사이다', icon: '🥤', price: '₩1,400' },
+                        { num: 3, name: '오렌지 탄산', icon: '🍊', price: '₩1,300' },
+                      ].map((item) => (
+                        <button
+                          key={item.num}
+                          type="button"
+                          onClick={() => {
+                            setVendingErrorMode(false);
+                            setVendingSelection(item.num);
+                          }}
+                          className={`p-2 rounded-lg border text-center transition-all cursor-pointer ${
+                            vendingSelection === item.num && !vendingErrorMode
+                              ? 'bg-emerald-950 border-emerald-500 text-emerald-200 ring-2 ring-emerald-400'
+                              : 'bg-stone-800/80 border-stone-700 text-stone-300 hover:bg-stone-750'
+                          }`}
+                        >
+                          <div className="text-xl mb-1">{item.icon}</div>
+                          <div className="text-[11px] font-bold">버튼 {item.num}</div>
+                          <div className="text-[10px] text-stone-400">{item.name}</div>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Misconception Trap Button */}
+                    <div className="mt-3 pt-2 border-t border-stone-800">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setVendingErrorMode(true);
+                          setVendingSelection(4);
+                        }}
+                        className={`w-full py-2 px-3 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                          vendingErrorMode
+                            ? 'bg-rose-950 border-rose-500 text-rose-200 ring-2 ring-rose-400'
+                            : 'bg-stone-800 border-stone-700 text-rose-300 hover:bg-rose-950/30'
+                        }`}
+                      >
+                        <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                        <span>오개념 체험: 4번 고장난 버튼 (버튼 1개 누름 ➔ 2개 음료 배출)</span>
+                      </button>
+                    </div>
+
+                    {/* Dispenser Tray Output */}
+                    <div className="mt-3 bg-stone-950 rounded-lg p-3 border border-stone-800 min-h-[70px] flex items-center justify-center">
+                      {!vendingSelection ? (
+                        <span className="text-stone-500 text-xs italic">
+                          버튼을 클릭하면 배출구로 결과물이 나옵니다.
+                        </span>
+                      ) : vendingErrorMode ? (
+                        <div className="text-center text-xs text-rose-300 space-y-1">
+                          <div className="text-lg">🍇 + 🥤 (동시 배출!)</div>
+                          <div className="font-bold text-rose-400">
+                            ❌ 함수 성립 불가 (오류 발생)
+                          </div>
+                          <div className="text-[11px] text-stone-300">
+                            입력 4번에 대해 서로 다른 2개 출력(포도, 사이다)이 동시에 나오면 함수의 정의(하나의 입력에 오직 하나의 결과)를 위반합니다!
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center text-xs text-emerald-300 space-y-1">
+                          <div className="text-lg">
+                            {vendingSelection === 1 ? '🍇 포도 주스' : vendingSelection === 2 ? '🥤 시원한 사이다' : '🍊 오렌지 탄산'}
+                          </div>
+                          <div className="font-bold text-emerald-400 flex items-center justify-center gap-1">
+                            <Check className="w-3.5 h-3.5" /> 올바른 함수 대응 성립!
+                          </div>
+                          <div className="text-[11px] text-stone-300">
+                            입력 번호 {vendingSelection}번에 오직 1개의 음료만 정확히 매핑됩니다.
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab 2: Pictorial (Venn Diagram Mapping) */}
+              {cpaStage === 'pictorial' && (
+                <div className="mt-4 bg-stone-950 p-4 rounded-xl border border-stone-800 space-y-3">
+                  <div className="text-xs font-bold text-emerald-400">
+                    시각적 도식화: 벤다이어그램 화살표 대응 모델
+                  </div>
+                  <p className="text-[11px] text-stone-400">
+                    앞서 조작한 자판기 실물을 주머니(집합)와 화살표로 도식화하여 머릿속 시각 심상(Mental Model)을 형성합니다.
+                  </p>
+
+                  <div className="bg-stone-900 rounded-xl p-3 border border-stone-800 flex items-center justify-around text-xs">
+                    {/* Domain X */}
+                    <div className="border-2 border-indigo-500/80 rounded-2xl p-3 bg-indigo-950/30 text-center w-28">
+                      <div className="font-bold text-indigo-300 mb-2 border-b border-indigo-800/60 pb-1">정의역 X (버튼)</div>
+                      <div className="space-y-2">
+                        <div className="p-1 rounded bg-stone-800 text-stone-200 font-mono">1 (포도)</div>
+                        <div className="p-1 rounded bg-stone-800 text-stone-200 font-mono">2 (사이다)</div>
+                        <div className="p-1 rounded bg-stone-800 text-stone-200 font-mono">3 (오렌지)</div>
+                      </div>
+                    </div>
+
+                    <div className="text-emerald-400 font-bold flex flex-col items-center gap-1">
+                      <span className="text-[10px] text-stone-400">대응 f</span>
+                      <ArrowRight className="w-5 h-5 text-emerald-400" />
+                      <span className="text-[9px] text-stone-500">1:1 단일 사상</span>
+                    </div>
+
+                    {/* Codomain Y */}
+                    <div className="border-2 border-amber-500/80 rounded-2xl p-3 bg-amber-950/30 text-center w-32">
+                      <div className="font-bold text-amber-300 mb-2 border-b border-amber-800/60 pb-1">공역 Y (음료)</div>
+                      <div className="space-y-1.5 text-[11px]">
+                        <div className="p-1 rounded bg-emerald-950/80 border border-emerald-600 text-emerald-300 font-semibold">
+                          포도 주스 (치역)
+                        </div>
+                        <div className="p-1 rounded bg-emerald-950/80 border border-emerald-600 text-emerald-300 font-semibold">
+                          사이다 (치역)
+                        </div>
+                        <div className="p-1 rounded bg-emerald-950/80 border border-emerald-600 text-emerald-300 font-semibold">
+                          오렌지 (치역)
+                        </div>
+                        <div className="p-1 rounded bg-stone-800 text-stone-400 opacity-60">
+                          생수 (미선택)
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-stone-400 bg-stone-900/60 p-2.5 rounded-lg border border-stone-800">
+                    💡 <strong className="text-emerald-300">CPA 분석:</strong> 공역에는 '생수'가 남아있지만, 모든 정의역 원소(1, 2, 3)가 오직 하나의 화살표를 쏘았으므로 완전한 함수입니다. (치역 ⊂ 공역)
+                  </p>
+                </div>
+              )}
+
+              {/* Tab 3: Abstract (Formal Mathematical Symbols) */}
+              {cpaStage === 'abstract' && (
+                <div className="mt-4 bg-stone-950 p-4 rounded-xl border border-stone-800 space-y-3">
+                  <div className="text-xs font-bold text-emerald-400">
+                    형식적 추상 기호: 수학적 엄밀 체계
+                  </div>
+                  <p className="text-[11px] text-stone-400">
+                    C(실물)와 P(도식)의 징검다리를 거쳐 비로소 고등학교 수학의 엄밀한 기호와 정의를 받아들입니다.
+                  </p>
+
+                  <div className="bg-stone-900 rounded-xl p-3.5 border border-stone-800 space-y-2.5 text-xs">
+                    <div className="flex items-center justify-between pb-2 border-b border-stone-800">
+                      <span className="text-stone-400">함수의 사상 기호:</span>
+                      <MathView math="f: X \to Y" className="text-indigo-300 font-bold" />
+                    </div>
+                    <div className="flex items-center justify-between pb-2 border-b border-stone-800">
+                      <span className="text-stone-400">함숫값 대응식:</span>
+                      <MathView math="f(1)=\text{포도}, \; f(2)=\text{사이다}, \; f(3)=\text{오렌지}" className="text-emerald-300 font-mono text-[11px]" />
+                    </div>
+                    <div className="flex items-center justify-between pb-2 border-b border-stone-800">
+                      <span className="text-stone-400">치역의 집합론적 정의:</span>
+                      <MathView math="f(X) = \{f(x) \mid x \in X\} \subsetneq Y" className="text-amber-300 font-mono text-[11px]" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-stone-400">수식 추상화 모델:</span>
+                      <MathView math="y = f(x) = ax + b" className="text-purple-300 font-bold" />
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-stone-400 bg-stone-900/60 p-2.5 rounded-lg border border-stone-800 leading-relaxed">
+                    🌟 싱가포르 교육부는 기호를 먼저 암기시키는 방식이 학생들의 수포자 전락 원인임을 발견했습니다. C(자판기)와 P(화살표)를 거친 학생은 추상 기호에 두려움을 갖지 않습니다.
+                  </p>
+                </div>
+              )}
             </div>
+          )}
+
+          {/* 2. Harvard Rule of Four Studio */}
+          {selectedPedagogyId === 'rule_of_four' && (
+            <div className="bg-stone-900 border border-stone-800 rounded-2xl p-5 shadow-lg">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+                <h3 className="text-sm font-bold text-stone-100 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-amber-400" />
+                  하버드 Rule of Four 다중 표상 실습기
+                </h3>
+                <span className="text-[10px] text-stone-400">함수: f(x) = 2x - 3</span>
+              </div>
+
+              <p className="text-xs text-stone-400 mt-2">
+                하나의 수학적 함수가 4가지 표상 체계(Verbal, Numerical, Graphical, Algebraic)로 어떻게 상호 번역되는지 직접 확인해보세요.
+              </p>
+
+              {/* 4 Tabs */}
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                {[
+                  { id: 'verbal', label: '1. 언어적 (Verbal)' },
+                  { id: 'numerical', label: '2. 수치적 (Table)' },
+                  { id: 'graphical', label: '3. 시각적 (Graph)' },
+                  { id: 'algebraic', label: '4. 대수적 (Formula)' },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveSquareTab(tab.id as any)}
+                    className={`p-2 rounded-lg text-xs font-medium text-left transition-all cursor-pointer ${
+                      activeSquareTab === tab.id
+                        ? 'bg-amber-500 text-stone-950 font-bold shadow-md'
+                        : 'bg-stone-950 text-stone-300 hover:bg-stone-800'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Display Area for Active Representation */}
+              <div className="mt-4 bg-stone-950 p-4 rounded-xl border border-stone-800 min-h-[220px] flex flex-col justify-center">
+                {activeSquareTab === 'verbal' && (
+                  <div className="space-y-3 text-xs">
+                    <div className="flex items-center gap-2 text-amber-400 font-bold">
+                      <span>자연어 맥락 묘사</span>
+                    </div>
+                    <blockquote className="p-3 rounded-lg bg-stone-900 border-l-4 border-amber-500 text-stone-200 italic leading-relaxed">
+                      "주차장에 차를 주차할 때, 기본요금 3000원이 할인되고 1시간마다 2000원씩 요금이 부과된다. 이때 총 주차비는 주차 시간 x의 일차함수 관계를 갖는다."
+                    </blockquote>
+                    <p className="text-stone-400 text-[11px]">
+                      ★ 학생에게 식을 외우게 하기 전, 실세계의 원인(시간 x)과 결과(비용 y)의 인과성을 언어로 기술하게 함으로써 수학의 추상성을 탈피시킵니다.
+                    </p>
+                  </div>
+                )}
+
+                {activeSquareTab === 'numerical' && (
+                  <div className="space-y-3 text-xs">
+                    <div className="flex items-center justify-between text-amber-400 font-bold">
+                      <span>수치 데이터 테이블</span>
+                      <span className="text-[10px] text-stone-400">Δx = 1 ➔ Δy = +2</span>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-center border-collapse text-xs">
+                        <thead>
+                          <tr className="bg-stone-900 text-stone-400 border-b border-stone-800">
+                            <th className="py-1.5 px-2">x (입력)</th>
+                            <th className="py-1.5 px-2">-1</th>
+                            <th className="py-1.5 px-2">0</th>
+                            <th className="py-1.5 px-2">1</th>
+                            <th className="py-1.5 px-2">2</th>
+                            <th className="py-1.5 px-2">3</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="text-stone-200">
+                            <td className="py-1.5 px-2 font-bold text-amber-400">y (출력)</td>
+                            <td className="py-1.5 px-2">-5</td>
+                            <td className="py-1.5 px-2">-3</td>
+                            <td className="py-1.5 px-2">-1</td>
+                            <td className="py-1.5 px-2">1</td>
+                            <td className="py-1.5 px-2">3</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="text-stone-400 text-[11px]">
+                      ★ 모든 y값이 중복 없이 2씩 일정하게 증가함을 관찰하여 일대일함수(Injective)임을 수치적으로 직접 확인합니다.
+                    </p>
+                  </div>
+                )}
+
+                {activeSquareTab === 'graphical' && (
+                  <div className="space-y-3 text-xs">
+                    <div className="flex items-center justify-between text-amber-400 font-bold">
+                      <span>좌표평면 시각 기하학</span>
+                      <span className="text-[10px] text-stone-400">기울기 2, y절편 -3</span>
+                    </div>
+                    <div className="h-32 bg-stone-900 rounded-lg flex items-center justify-center border border-stone-800 relative overflow-hidden">
+                      <svg viewBox="0 0 200 100" className="w-full h-full">
+                        <line x1="10" y1="50" x2="190" y2="50" stroke="#57534e" strokeWidth="1" />
+                        <line x1="100" y1="10" x2="100" y2="90" stroke="#57534e" strokeWidth="1" />
+                        <line x1="40" y1="90" x2="140" y2="10" stroke="#f59e0b" strokeWidth="2.5" />
+                        <line x1="10" y1="35" x2="190" y2="35" stroke="#ec4899" strokeWidth="1" strokeDasharray="3 3" />
+                        <circle cx="115" cy="35" r="3.5" fill="#ec4899" stroke="#fff" />
+                      </svg>
+                    </div>
+                    <p className="text-stone-400 text-[11px]">
+                      ★ 수직선 판별법(오직 한 점에서 만남 ➔ 함수)과 수평선 판별법(오직 한 점에서 만남 ➔ 일대일대응 ➔ 역함수 존재)을 동시에 검증합니다.
+                    </p>
+                  </div>
+                )}
+
+                {activeSquareTab === 'algebraic' && (
+                  <div className="space-y-3 text-xs">
+                    <div className="flex items-center justify-between text-amber-400 font-bold">
+                      <span>대수적 기호 체계 & 역함수 연산</span>
+                    </div>
+                    <div className="p-3 bg-stone-900 rounded-lg border border-stone-800 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-stone-400">원래 함수:</span>
+                        <MathView math="f(x) = 2x - 3" className="text-amber-300 font-bold" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-stone-400">역함수 변환:</span>
+                        <MathView math="x = \frac{y + 3}{2} \implies f^{-1}(x) = \frac{1}{2}x + \frac{3}{2}" className="text-purple-300 font-mono text-xs" />
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] pt-1 border-t border-stone-800">
+                        <span className="text-stone-400">합성 확인:</span>
+                        <MathView math="(f^{-1} \circ f)(x) = x" className="text-emerald-400 font-mono" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 3. APOS Theory Studio */}
+          {selectedPedagogyId === 'apos_theory' && (
+            <div className="bg-stone-900 border border-stone-800 rounded-2xl p-5 shadow-lg">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+                <h3 className="text-sm font-bold text-stone-100 flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-purple-400" />
+                  APOS 인지 사다리 시뮬레이터
+                </h3>
+                <span className="text-[10px] text-purple-300 font-mono">Ed Dubinsky</span>
+              </div>
+
+              <p className="text-xs text-stone-400 mt-2">
+                학습자가 외부 지시에 의한 개별 행동(Action)에서 총체적 스키마(Schema)로 도약하는 4단계를 클릭해보세요.
+              </p>
+
+              <div className="mt-4 grid grid-cols-4 gap-1.5">
+                {[
+                  { step: 1, label: 'Action (행동)' },
+                  { step: 2, label: 'Process (과정)' },
+                  { step: 3, label: 'Object (대상)' },
+                  { step: 4, label: 'Schema (도식)' },
+                ].map((s) => (
+                  <button
+                    key={s.step}
+                    type="button"
+                    onClick={() => setAposStep(s.step)}
+                    className={`py-2 px-1 rounded-lg text-[11px] font-bold text-center transition-all cursor-pointer ${
+                      aposStep === s.step
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : 'bg-stone-950 text-stone-400 hover:bg-stone-800'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-4 bg-stone-950 p-4 rounded-xl border border-stone-800 text-xs space-y-2">
+                {aposStep === 1 && (
+                  <>
+                    <div className="font-bold text-purple-300">1단계: Action (개별 계산 수행)</div>
+                    <p className="text-stone-300 leading-relaxed">
+                      "x=1 넣으면 2*1+3=5, x=2 넣으면 7". 규칙을 기계적으로 한 땀 한 땀 숫자를 대입하여 계산하는 초보 단계.
+                    </p>
+                  </>
+                )}
+                {aposStep === 2 && (
+                  <>
+                    <div className="font-bold text-purple-300">2단계: Process (과정 내면화)</div>
+                    <p className="text-stone-300 leading-relaxed">
+                      숫자를 일일이 넣지 않아도 "x를 받아서 2배하고 3을 더하는 변환 파이프라인"으로 함수 전체의 흐름을 조망.
+                    </p>
+                  </>
+                )}
+                {aposStep === 3 && (
+                  <>
+                    <div className="font-bold text-purple-300">3단계: Object (함수 자체의 대상화)</div>
+                    <p className="text-stone-300 leading-relaxed">
+                      함수 f 자체를 하나의 독자적 수학적 객체(Object)로 인식. f와 g를 더하거나 합성(f ∘ g)하고 역함수를 취할 수 있는 독립 개체로 취급.
+                    </p>
+                  </>
+                )}
+                {aposStep === 4 && (
+                  <>
+                    <div className="font-bold text-purple-300">4단계: Schema (통합 인지 도식)</div>
+                    <p className="text-stone-300 leading-relaxed">
+                      함수의 대수식, 그래프, 미분 가능성, 역함수 존재 조건, 집합론적 사상이 하나의 통합 네트워크로 뇌 속에 완성.
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 4. Tall & Vinner or other pedagogies */}
+          {selectedPedagogyId !== 'cpa_model' && selectedPedagogyId !== 'rule_of_four' && selectedPedagogyId !== 'apos_theory' && (
+            <div className="bg-stone-900 border border-stone-800 rounded-2xl p-5 shadow-lg">
+              <div className="flex items-center justify-between pb-3 border-b border-stone-800">
+                <h3 className="text-sm font-bold text-stone-100 flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-amber-400" />
+                  글로벌 수학교육 연구 핵심 진단
+                </h3>
+                <span className="text-[10px] text-stone-400">Didactics Research</span>
+              </div>
+              <div className="mt-4 bg-stone-950 p-4 rounded-xl border border-stone-800 space-y-3 text-xs">
+                <div className="font-bold text-amber-400">
+                  {selectedPedagogy.name}의 교실 현장 시사점
+                </div>
+                <p className="text-stone-300 leading-relaxed">
+                  {selectedPedagogy.corePhilosophy}
+                </p>
+                <div className="p-3 bg-stone-900 rounded-lg border border-stone-800 text-[11px] space-y-1">
+                  <span className="text-indigo-300 font-bold block">권장 교실 액티비티:</span>
+                  <span className="text-stone-300">{selectedPedagogy.recommendedActivity}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Common Cognitive Conflict Note */}
+          <div className="p-4 rounded-xl bg-indigo-950/40 border border-indigo-800/40 text-xs">
+            <span className="font-bold text-indigo-300 flex items-center gap-1.5 mb-1.5">
+              <Lightbulb className="w-4 h-4 text-amber-400" />
+              수학교육학 교수-학습 팁 (Teacher Tip)
+            </span>
+            <p className="text-stone-300 text-[11px] leading-relaxed">
+              학생들이 함수를 어려워하는 이유는 지능이 부족해서가 아니라, 추상 기호로 직행하기 때문입니다.
+              싱가포르의 CPA 교수법이나 하버드의 Rule of Four처럼 실물과 도식을 매개로 다중 표상을 넘나들게 할 때
+              상위권의 고난도 수능 킬러 문항 추론력과 중하위권의 기초 학력이 동시에 완성됩니다.
+            </p>
           </div>
         </div>
       </div>
