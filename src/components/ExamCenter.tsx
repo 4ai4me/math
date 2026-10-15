@@ -3,6 +3,7 @@ import { QuestionItem, StudentInfo, StudentSubmission, QuestionLevel, UnitId } f
 import { QUESTION_BANK } from '../data/questions';
 import { CURRICULUM_UNITS } from '../data/curriculumUnits';
 import { MathView } from './MathView';
+import { calculateEvaluation, generateDeviceTokenAndMac } from '../utils/mathLogic';
 import confetti from 'canvas-confetti';
 import {
   UserCheck,
@@ -61,20 +62,33 @@ export const ExamCenter: React.FC<ExamCenterProps> = ({ onGoToTextbook }) => {
   // Result State
   const [submissionResult, setSubmissionResult] = useState<StudentSubmission | null>(null);
 
-  // Fetch client device identity on mount
+  // Fetch client device identity on mount (with GitHub Pages fallback)
   useEffect(() => {
     fetch('/api/device/identify')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('API unavailable');
+        return res.json();
+      })
       .then((data) => {
         setStudent((prev) => ({
           ...prev,
-          clientIp: data.clientIp || '192.168.1.100',
+          clientIp: data.clientIp || '127.0.0.1',
           deviceId: data.deviceToken || 'DEV-F89A12BC4401',
           macSimulatedId: data.macSimulatedId || 'F8:9A:12:BC:44:01',
         }));
         setDeviceLoading(false);
       })
       .catch(() => {
+        // Standalone / GitHub Pages Fallback
+        const seed = navigator.userAgent || 'KSTEM-CLIENT-MOBILE';
+        const clientIp = '127.0.0.1 (단말 자체 감지)';
+        const { deviceToken, macSimulatedId } = generateDeviceTokenAndMac(clientIp, seed);
+        setStudent((prev) => ({
+          ...prev,
+          clientIp,
+          deviceId: deviceToken,
+          macSimulatedId,
+        }));
         setDeviceLoading(false);
       });
   }, []);
@@ -160,20 +174,54 @@ export const ExamCenter: React.FC<ExamCenterProps> = ({ onGoToTextbook }) => {
           durationSeconds: elapsedSeconds,
         }),
       });
-      const data = await response.json();
-      setSubmissionResult(data.submission);
-      setPhase('result');
 
-      // Trigger Confetti if score >= 80
-      if (data.submission.percentage >= 80) {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 },
-        });
+      if (response.ok) {
+        const data = await response.json();
+        setSubmissionResult(data.submission);
+        setPhase('result');
+        if (data.submission.percentage >= 80) {
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+        return;
       }
-    } catch (e) {
-      alert('평가 제출 중 오류가 발생했습니다.');
+    } catch {
+      // Backend unavailable (e.g. GitHub Pages static deployment)
+    }
+
+    // Client-side Standalone Evaluation (GitHub Pages Fallback)
+    const meta: Record<string, { level: number; topic: string }> = {};
+    for (const q of QUESTION_BANK) {
+      meta[q.id] = { level: q.level, topic: q.topic };
+    }
+    const evaluation = calculateEvaluation(answersPayload, meta);
+
+    const fallbackSubmission: StudentSubmission = {
+      id: `sub-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      student,
+      unitId: selectedUnitId,
+      level: selectedLevel,
+      submittedAt: new Date().toISOString(),
+      durationSeconds: elapsedSeconds,
+      answers: answersPayload,
+      score: evaluation.score,
+      totalQuestions: answersPayload.length,
+      percentage: evaluation.percentage,
+      competencyScores: evaluation.competencyScores,
+      feedbackSummary: evaluation.feedbackSummary,
+      prescriptions: evaluation.prescriptions,
+    };
+
+    // Save to localStorage for Teacher Dashboard
+    try {
+      const existing = JSON.parse(localStorage.getItem('kstem_submissions') || '[]');
+      localStorage.setItem('kstem_submissions', JSON.stringify([fallbackSubmission, ...existing]));
+    } catch {}
+
+    setSubmissionResult(fallbackSubmission);
+    setPhase('result');
+
+    if (fallbackSubmission.percentage >= 80) {
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
   };
 

@@ -17,6 +17,19 @@
   </head>
   <body class="bg-stone-900 text-stone-100 antialiased selection:bg-amber-500 selection:text-white font-sans">
     <div id="root"></div>
+    <script>
+      // GitHub Pages Compatibility Fallback:
+      // If served directly as raw unbuilt source from GitHub Pages root without Vite dev server,
+      // redirect to /docs/ where the compiled production bundle is available.
+      if (
+        window.location.hostname.endsWith('github.io') &&
+        !window.location.pathname.includes('/docs') &&
+        !document.querySelector('script[src*="assets/"]')
+      ) {
+        var base = window.location.pathname.replace(/\/+$/, '');
+        window.location.replace(base + '/docs/' + window.location.search + window.location.hash);
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

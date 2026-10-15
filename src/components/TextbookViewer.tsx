@@ -107,12 +107,45 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({
     }
   }, [isSoundEnabled]);
 
-  // Sync initialPage if prop changes
-  useEffect(() => {
-    if (initialPage >= 1 && initialPage <= totalPages) {
-      setCurrentPage(initialPage);
+  // Touch swipe support for mobile/tablet eBook page flipping
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      touchStartXRef.current = e.touches[0].clientX;
+      touchStartYRef.current = e.touches[0].clientY;
     }
-  }, [initialPage, totalPages]);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartYRef.current;
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+
+    // Only swipe if horizontal distance is significantly greater than vertical scroll
+    if (Math.abs(deltaX) > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+      if (deltaX < 0) {
+        goToNext(); // Swipe left -> Next page
+      } else {
+        goToPrev(); // Swipe right -> Previous page
+      }
+    }
+  };
+
+  // Auto-detect mobile screens and default to single page view for comfortable reading
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setViewMode((prev) => (prev === 'double' ? 'single' : prev));
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const goToPrev = () => {
     if (currentPage <= 1) return;
@@ -928,7 +961,11 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({
       )}
 
       {/* ================= 3D EBOOK SPREAD STAGE ================= */}
-      <div className="relative w-full overflow-hidden flex items-center justify-center py-2 [perspective:2400px]">
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        className="relative w-full overflow-hidden flex items-center justify-center py-2 [perspective:2400px] touch-pan-y"
+      >
         {/* Floating Quick Flip Arrows for Desktop */}
         <button
           disabled={currentPage <= 1}
@@ -994,6 +1031,29 @@ export const TextbookViewer: React.FC<TextbookViewerProps> = ({
             </motion.div>
           </AnimatePresence>
         </div>
+      </div>
+
+      {/* Mobile Quick Flip Floating Navigation (보조 넘김 바: 좌우 스와이프 제스처 및 원터치 버튼) */}
+      <div className="flex md:hidden items-center justify-between bg-stone-900 border border-stone-800 rounded-xl px-4 py-2 text-xs shadow-lg">
+        <button
+          disabled={currentPage <= 1}
+          onClick={goToPrev}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 disabled:opacity-40 disabled:pointer-events-none"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span>이전 쪽</span>
+        </button>
+        <span className="text-stone-400 font-mono text-[11px]">
+          손가락 좌우 스와이프로 책 넘김 가능 ({currentPage}/{totalPages})
+        </span>
+        <button
+          disabled={currentPage >= totalPages}
+          onClick={goToNext}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold disabled:opacity-40 disabled:pointer-events-none"
+        >
+          <span>다음 쪽</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
 
       {/* ================= 2BOOK K-STEM BOTTOM THUMBNAIL SLIDER ================= */}

@@ -46,13 +46,83 @@ export const TeacherDashboard: React.FC = () => {
   const fetchDashboardData = () => {
     setLoading(true);
     fetch('/api/evaluations')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('API unavailable');
+        return res.json();
+      })
       .then((data) => {
         setAnalytics(data.analytics);
         setSubmissions(data.submissions || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        // Fallback for static hosting (GitHub Pages) using localStorage
+        try {
+          const stored: StudentSubmission[] = JSON.parse(
+            localStorage.getItem('kstem_submissions') || '[]'
+          );
+          setSubmissions(stored);
+
+          if (stored.length > 0) {
+            const totalScore = stored.reduce((acc, s) => acc + s.score, 0);
+            const avg = Math.round(totalScore / stored.length);
+
+            const classMap: Record<string, { count: number; totalScore: number }> = {};
+            const itemMap: Record<string, { correctCount: number; totalCount: number }> = {};
+            const deviceLogs: TeacherAnalytics['deviceLogs'] = [];
+
+            stored.forEach((sub) => {
+              const cKey = `${sub.student.grade}학년 ${sub.student.classNum}반`;
+              if (!classMap[cKey]) classMap[cKey] = { count: 0, totalScore: 0 };
+              classMap[cKey].count += 1;
+              classMap[cKey].totalScore += sub.score;
+
+              sub.answers.forEach((ans) => {
+                if (!itemMap[ans.questionId]) {
+                  itemMap[ans.questionId] = { correctCount: 0, totalCount: 0 };
+                }
+                itemMap[ans.questionId].totalCount += 1;
+                if (ans.isCorrect) itemMap[ans.questionId].correctCount += 1;
+              });
+
+              deviceLogs.push({
+                studentKey: `${sub.student.grade}학년 ${sub.student.classNum}반 ${sub.student.studentNum}번 ${sub.student.name}`,
+                clientIp: sub.student.clientIp,
+                macId: sub.student.macSimulatedId,
+                submittedAt: sub.submittedAt,
+                score: sub.score,
+              });
+            });
+
+            const classBreakdown: TeacherAnalytics['classBreakdown'] = {};
+            Object.entries(classMap).forEach(([k, v]) => {
+              classBreakdown[k] = { count: v.count, avgScore: Math.round(v.totalScore / v.count) };
+            });
+
+            const itemAccuracy: TeacherAnalytics['itemAccuracy'] = {};
+            Object.entries(itemMap).forEach(([k, v]) => {
+              itemAccuracy[k] = {
+                correctCount: v.correctCount,
+                totalCount: v.totalCount,
+                rate: Math.round((v.correctCount / v.totalCount) * 100),
+              };
+            });
+
+            setAnalytics({
+              totalSubmissions: stored.length,
+              averageScore: avg,
+              classBreakdown,
+              itemAccuracy,
+              deviceLogs,
+            });
+          } else {
+            setAnalytics(null);
+          }
+        } catch {
+          setAnalytics(null);
+        }
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
